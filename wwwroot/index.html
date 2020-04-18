@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HS app</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="js/vue-virtual-scroll-list.js"></script>
+</head>
+<body>
+    <h1>HS app</h1>
+    <div id="app">
+        <input v-model="userName"><!-- user name box -->
+        <button :disabled='isUserSelected' v-on:click="addUser">Add User</button>
+        <!-- user list -->
+        <ol>
+            <li v-for="user in filteredUsers">
+                {{ user.name }}
+            </li>
+        </ol>
+        <!-- contact list -->
+        <ol>
+            <li v-for="contact in contacts">
+                {{ contact.name }}
+            </li>
+        </ol>
+        <!-- contact form -->
+    </div>
+
+    <script type="module">
+
+//Add User
+//Select User List? Dropdown? (search?)
+//Add Address
+//Address List (pages?)
+//View Address
+//Update Address Button
+
+//Extra: debounce search
+//Extra: virtual list:
+//import Contact from './js/Contact';
+// <virtual-list class="list"
+//             :size="60"
+//             :keeps="30"
+//             :data-key="'ID'"
+//             :data-sources="Contacts"
+//             :data-component="itemComponent"
+//             />
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                userName: '', //Doubles as search, or name for creating user
+                isUserSelected: false, //When a user is matched exactly, disable add button and query contacts
+                users: [],
+                contacts: [],
+            },
+            computed: {
+                filteredUsers: function() {
+                    let results;
+                    if(this.userName) {
+                        results = this.users.filter(user => {
+                            return user.name.toLowerCase().indexOf(this.userName.toLowerCase()) > -1
+                        });
+                    } else {
+                        results = this.users;
+                    }
+                    this.isUserSelected = results.length == 1 && results[0].name == this.userName;
+                    return results;
+                },
+            },
+            methods: {
+                addUser: function() {
+                    //Call post on user
+                },
+                getUsers: function() {
+                    //When should we refresh users list?
+                    axios.get('https://localhost:5001/User').then(response => (this.users = response.data))
+                }
+            },
+            mounted() {
+                //Need to figure out how to build URL here.
+                axios.get('https://localhost:5001/User').then(response => (this.users = response.data))
+            },
+        })
+    </script>
+</body>
+</html>
+
